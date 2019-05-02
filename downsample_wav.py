@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import librosa
+import scipy
+import numpy as np
 import os
 
 """
@@ -38,7 +40,12 @@ OUTPUT_RATE = 16000
 def resample_file(input_filename, output_filename, sample_rate):
     mono = True # librosa converts signal to mono by default, so I'm just surfacing this
     audio, _rate = librosa.load(input_filename, sr=sample_rate, mono=mono)
-    librosa.output.write_wav(output_filename, audio, sr=sample_rate)
+
+    # librosa can't write int16
+    #librosa.output.write_wav(output_filename, audio, sr=sample_rate)
+
+    audio = audio.astype(np.int16)
+    scipy.io.wavfile.write(output_filename, sample_rate, audio)
 
 output_dir = '/home/bt/dev/voice-tools/temp'
 input_dir = '/home/bt/dev/2nd/Tacotron-2/LJSpeech-1.1/wavs/'

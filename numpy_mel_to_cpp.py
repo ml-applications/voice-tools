@@ -40,7 +40,10 @@ def numpy_to_raw_mel(input_file, output_file):
         for b in buf:
             f.write(b)
 
-input_file = '/home/bt/dev/2nd/Tacotron-2/training_data/mels/mel-LJ001-0109.npy'
+#input_file = '/home/bt/dev/2nd/WaveRNN-Pytorch/model_outputs/mel-northandsouth_52_f000076.npy'
+#input_file = '/home/bt/dev/2nd/Tacotron-2/training_data/mels/mel-LJ001-0109.npy'
+#input_file = '/home/bt/dev/2nd/Tacotron-2/training_data/mels/mel-trump_2018_02_15-001.npy'
+input_file = '/home/bt/dev/2nd/Tacotron-2/training_data/mels/mel-trump_2018_02_15-151.npy'
 
-numpy_to_raw_mel(input_file, 'output.cppmel')
+numpy_to_raw_mel(input_file, 'output.cpp-5.mel')
 

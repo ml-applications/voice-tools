@@ -44,11 +44,19 @@ def resample_file(input_filename, output_filename, sample_rate):
     # librosa can't write int16
     #librosa.output.write_wav(output_filename, audio, sr=sample_rate)
 
+    # Scale audio to the range of 16 bit PCM
+    # https://stackoverflow.com/a/52757235
+    audio /= 1.414 # Scale to [-1.0, 1.0]
+    audio *= 32767 # Scale to int16
     audio = audio.astype(np.int16)
     scipy.io.wavfile.write(output_filename, sample_rate, audio)
 
-output_dir = '/home/bt/dev/voice-tools/temp'
-input_dir = '/home/bt/dev/2nd/Tacotron-2/LJSpeech-1.1/wavs/'
+#input_dir = '/home/bt/dev/2nd/Tacotron-2/LJSpeech-1.1/wavs/'
+#input_dir = '/home/bt/dev/audio-samples/trump/wavs'
+input_dir = './input'
+#output_dir = '/home/bt/dev/voice-tools/temp'
+output_dir = './conversion_output'
+
 
 for name in os.listdir(input_dir):
     input_filename = os.path.join(input_dir, name)

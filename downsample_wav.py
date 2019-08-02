@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
 import librosa
-import scipy
 import numpy as np
 import os
+import scipy
+import sys
 
 """
 Testing LJS Resample
@@ -37,6 +38,19 @@ Everything in ML is Float 32 bit?
 
 OUTPUT_RATE = 16000
 
+input_dir = '/home/bt/dev/audio-samples/conversion/dst'
+output_dir = './output'
+
+def check_directories(dir_input, dir_output):
+    if not os.path.exists(dir_input):
+        sys.exit('Error: Input directory does not exist: {}'.format(dir_input))
+    if not os.path.exists(dir_output):
+        sys.exit('Error: Output directory does not exist: {}'.format(dir_output))
+    abs_a = os.path.abspath(dir_input)
+    abs_b = os.path.abspath(dir_output)
+    if abs_a == abs_b:
+        sys.exit('Error: Paths are the same: {}'.format(abs_a))
+
 def resample_file(input_filename, output_filename, sample_rate):
     mono = True # librosa converts signal to mono by default, so I'm just surfacing this
     audio, _rate = librosa.load(input_filename, sr=sample_rate, mono=mono)
@@ -51,22 +65,20 @@ def resample_file(input_filename, output_filename, sample_rate):
     audio = audio.astype(np.int16)
     scipy.io.wavfile.write(output_filename, sample_rate, audio)
 
-#input_dir = '/home/bt/dev/2nd/Tacotron-2/LJSpeech-1.1/wavs/'
-#input_dir = '/home/bt/dev/audio-samples/trump/wavs'
-input_dir = './input'
-#output_dir = '/home/bt/dev/voice-tools/temp'
-output_dir = './conversion_output'
+def downsample_wav_files(input_dir, output_dir, output_sample_rate):
+    check_directories(input_dir, output_dir)
 
+    for i, name in enumerate(os.listdir(input_dir)):
+        input_filename = os.path.join(input_dir, name)
 
-for name in os.listdir(input_dir):
-    input_filename = os.path.join(input_dir, name)
+        if not os.path.isfile(input_filename) \
+                or not name.endswith(".wav"):
+            continue
 
-    if not os.path.isfile(input_filename) \
-            or not name.endswith(".wav"):
-        continue
+        output_filename = os.path.join(output_dir, name)
 
-    output_filename = os.path.join(output_dir, name)
+        resample_file(input_filename, output_filename, output_sample_rate)
+        print('Finished {}: {}'.format(i, name))
 
-    resample_file(input_filename, output_filename, OUTPUT_RATE)
-    print(name)
+downsample_wav_files(input_dir, output_dir, OUTPUT_RATE)
 

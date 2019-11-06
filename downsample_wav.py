@@ -38,8 +38,10 @@ Everything in ML is Float 32 bit?
 
 OUTPUT_RATE = 16000
 
-input_dir = '/home/bt/dev/audio-samples/conversion/dst'
-output_dir = './output'
+input_dir_1 = '/home/bt/dev/audio-samples/conversion/trump/brandon_src/'
+input_dir_2 = '/home/bt/dev/audio-samples/conversion/trump/trump_dst/'
+output_dir_1 = './output_brandon'
+output_dir_2 = './output_trump'
 
 def check_directories(dir_input, dir_output):
     if not os.path.exists(dir_input):
@@ -80,5 +82,7 @@ def downsample_wav_files(input_dir, output_dir, output_sample_rate):
         resample_file(input_filename, output_filename, output_sample_rate)
         print('Finished {}: {}'.format(i, name))
 
-downsample_wav_files(input_dir, output_dir, OUTPUT_RATE)
+downsample_wav_files(input_dir_1, output_dir_1, OUTPUT_RATE)
+downsample_wav_files(input_dir_2, output_dir_2, OUTPUT_RATE)
+
 

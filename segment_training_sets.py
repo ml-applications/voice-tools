@@ -21,6 +21,10 @@ dst_testing_dir = './ready/trump/test'
 
 NAMING_SCHEME = re.compile(r'(?P<name>[0-9A-Za-z]+)_(?P<date>\d{4}_\d{2}_\d{2})-(?P<sample>\d{3})-?(?P<variant>\d{3})?\.wav')
 
+SKIP_SETS = set([
+    '2018_02_15', # These sound 'acted' and fake.
+])
+
 def check_directories_not_same(dir_input, dir_output):
     if not os.path.exists(dir_input):
         sys.exit('Error: Input directory does not exist: {}'.format(dir_input))
@@ -64,6 +68,14 @@ def check_same_files_between_dirs(dir_a, dir_b):
     do_check(dir_a, dir_b)
     do_check(dir_b, dir_a)
 
+def should_skip(source_filename):
+    matches = NAMING_SCHEME.match(source_filename)
+    if not matches:
+        return True
+    if matches['date'] in SKIP_SETS:
+        return True
+    return False
+
 # === Plan & Mutation Bits ===
 
 num_src_wavs = count_wavs_in_directory(src_voice_dir)
@@ -71,12 +83,29 @@ num_dst_wavs = count_wavs_in_directory(dst_voice_dir)
 
 print('{} source speaker wavs, {} destination speaker wavs'.format(num_src_wavs, num_dst_wavs))
 
-num_test = int(num_src_wavs * HOLD_FOR_TEST)
+prelim_num_test = int(num_src_wavs * HOLD_FOR_TEST)
 
-print('Num total: {}'.format(num_src_wavs))
-print('Num for test: {}'.format(num_test))
+print('Original num total: {}'.format(num_src_wavs))
+print('Prelim num for training: {}'.format(num_src_wavs - prelim_num_test))
+print('Prelim num for test: {}'.format(prelim_num_test))
 
-withold_for_test = num_src_wavs // num_test
+actual_num_src_wavs = 0
+skipped_wavs = 0
+
+for i, name in enumerate(sorted(os.listdir(src_voice_dir))):
+    if should_skip(name):
+        skipped_wavs += 1
+    else:
+        actual_num_src_wavs += 1
+
+actual_num_test = int(actual_num_src_wavs * HOLD_FOR_TEST)
+actual_withold_for_test = actual_num_src_wavs // actual_num_test
+
+print('Skipped wavs: {}'.format(skipped_wavs))
+print('Actual num total: {}'.format(actual_num_src_wavs))
+print('Actual num for training: {}'.format(actual_num_src_wavs - actual_num_test))
+print('Actual num for test: {}'.format(actual_num_test))
+
 duplicated_count = 0
 
 for i, name in enumerate(sorted(os.listdir(src_voice_dir))):
@@ -84,6 +113,9 @@ for i, name in enumerate(sorted(os.listdir(src_voice_dir))):
     # There may be extra 'source' samples.
     full_src_path = os.path.join(src_voice_dir, name)
     full_dst_path = os.path.join(dst_voice_dir, name)
+
+    if should_skip(name):
+        continue
 
     duplicate_plan = None
     if not os.path.exists(full_dst_path):
@@ -95,14 +127,14 @@ for i, name in enumerate(sorted(os.listdir(src_voice_dir))):
         else:
             duplicated_count += 1
 
-    if i % withold_for_test == 0:
+    if i % actual_withold_for_test == 0:
         shutil.copy(full_src_path, src_testing_dir)
         if not duplicate_plan:
             shutil.copy(full_dst_path, dst_testing_dir)
         else:
             from_ = os.path.join(dst_voice_dir, duplicate_plan['from'])
             to = os.path.join(dst_testing_dir, duplicate_plan['to'])
-            #shutil.copy(from_, to)
+            shutil.copy(from_, to)
     else:
         shutil.copy(full_src_path, src_training_dir)
         if not duplicate_plan:

@@ -7,8 +7,8 @@ import sys
 
 HOLD_FOR_TEST  = 0.2
 
-src_voice_dir = './output_brandon'
-dst_voice_dir = './output_trump'
+src_voice_dir = './resampled/brandon'
+dst_voice_dir = './resampled/trump'
 
 src_training_dir = './ready/brandon/training'
 src_testing_dir = './ready/brandon/test'

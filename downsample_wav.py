@@ -40,8 +40,8 @@ OUTPUT_RATE = 16000
 
 input_dir_1 = '/home/bt/dev/audio-samples/conversion/trump/brandon_src/'
 input_dir_2 = '/home/bt/dev/audio-samples/conversion/trump/trump_dst/'
-output_dir_1 = './output_brandon'
-output_dir_2 = './output_trump'
+output_dir_1 = './resampled/brandon'
+output_dir_2 = './resampled/trump'
 
 def check_directories(dir_input, dir_output):
     if not os.path.exists(dir_input):

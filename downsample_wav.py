@@ -36,12 +36,12 @@ Everything in ML is Float 32 bit?
 
 """
 
-OUTPUT_RATE = 16000
+OUTPUT_RATE = 22050
 
-input_dir_1 = '/home/bt/dev/audio-samples/conversion/trump/brandon_src/'
-input_dir_2 = '/home/bt/dev/audio-samples/conversion/trump/trump_dst/'
-output_dir_1 = './resampled/brandon'
-output_dir_2 = './resampled/trump'
+#input_dir_1 = '/home/bt/dev/audio-samples/conversion/trump/brandon_src/'
+#input_dir_2 = '/home/bt/dev/audio-samples/conversion/trump/trump_dst/'
+#output_dir_1 = './resampled/brandon'
+#output_dir_2 = './resampled/trump'
 
 def check_directories(dir_input, dir_output):
     if not os.path.exists(dir_input):
@@ -82,7 +82,28 @@ def downsample_wav_files(input_dir, output_dir, output_sample_rate):
         resample_file(input_filename, output_filename, output_sample_rate)
         print('Finished {}: {}'.format(i, name))
 
-downsample_wav_files(input_dir_1, output_dir_1, OUTPUT_RATE)
-downsample_wav_files(input_dir_2, output_dir_2, OUTPUT_RATE)
+#downsample_wav_files(input_dir_1, output_dir_1, OUTPUT_RATE)
+#downsample_wav_files(input_dir_2, output_dir_2, OUTPUT_RATE)
 
+
+#downsample_wav_files('/home/bt/datasets/melgan_transfer_learning/training-src',
+#        '/home/bt/datasets/melgan_transfer_learning/training', OUTPUT_RATE)
+
+#downsample_wav_files('/home/bt/datasets/melgan_transfer_learning/validation-src',
+#        '/home/bt/datasets/melgan_transfer_learning/validation', OUTPUT_RATE)
+
+"""
+downsample_wav_files('/home/bt/datasets/voicecurator_training/wav_original',
+                    '/home/bt/datasets/voicecurator_training/wav',
+                    OUTPUT_RATE)
+"""
+
+
+downsample_wav_files('/home/bt/datasets/voicecurator_training/ready_for_training_melgan/training-original',
+                    '/home/bt/datasets/voicecurator_training/ready_for_training_melgan/training',
+                    OUTPUT_RATE)
+
+downsample_wav_files('/home/bt/datasets/voicecurator_training/ready_for_training_melgan/validation-original',
+                    '/home/bt/datasets/voicecurator_training/ready_for_training_melgan/validation',
+                    OUTPUT_RATE)
 

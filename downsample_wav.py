@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import librosa
 import numpy as np
 import os
@@ -39,11 +40,6 @@ Everything in ML is Float 32 bit?
 """
 
 OUTPUT_RATE = 22050
-
-#input_dir_1 = '/home/bt/dev/audio-samples/conversion/trump/brandon_src/'
-#input_dir_2 = '/home/bt/dev/audio-samples/conversion/trump/trump_dst/'
-#output_dir_1 = './resampled/brandon'
-#output_dir_2 = './resampled/trump'
 
 def check_directories(dir_input, dir_output):
     if not os.path.exists(dir_input):
@@ -96,91 +92,18 @@ def downsample_wav_files(input_dir, output_dir, output_sample_rate):
         resample_file(input_filename, output_filename, output_sample_rate)
 
 
-model = sys.argv[1]
+def parse_args():
+  parser = argparse.ArgumentParser('Split audio into ingestible chunks')
+  parser.add_argument('--input_directory', type=str, required=True)
+  parser.add_argument('--output_directory', type=str, required=True)
+  return parser.parse_args()
 
-if model == 'melgan':
-  downsample_wav_files('/home/bt/dev/voicecurator/ready_for_melgan_learning/training_original',
-                      '/home/bt/dev/voicecurator/ready_for_melgan_learning/training',
-                      OUTPUT_RATE)
+args = parse_args()
 
-  downsample_wav_files('/home/bt/dev/voicecurator/ready_for_melgan_learning/validation_original',
-                      '/home/bt/dev/voicecurator/ready_for_melgan_learning/validation',
-                      OUTPUT_RATE)
+print('Input directory: {}'.format(args.input_directory))
+print('Output directory: {}'.format(args.output_directory))
 
-elif model == 'glow_tts':
-  downsample_wav_files('/home/bt/dev/voicecurator/ready_for_transfer_learning/wav_original',
-                      '/home/bt/dev/voicecurator/ready_for_transfer_learning/wav',
-                      OUTPUT_RATE)
-elif model == 'melgan':
-  downsample_wav_files('/home/bt/dev/voicecurator/ready_for_melgan_learning/original/training',
-                      '/home/bt/dev/voicecurator/ready_for_melgan_learning/training',
-                      OUTPUT_RATE)
-  downsample_wav_files('/home/bt/dev/voicecurator/ready_for_melgan_learning/original/validation',
-                      '/home/bt/dev/voicecurator/ready_for_melgan_learning/validation',
-                      OUTPUT_RATE)
-elif model == 'reagan':
-  downsample_wav_files('/home/bt/dev/voicecurator/ready_reagan/wav_original',
-                      '/home/bt/dev/voicecurator/ready_reagan/wav',
-                      OUTPUT_RATE)
-elif model == 'oliver':
-  downsample_wav_files('/home/bt/dev/voicecurator/ready_oliver/wav_original',
-                      '/home/bt/dev/voicecurator/ready_oliver/wav',
-                      OUTPUT_RATE)
-elif model == 'queen':
-  downsample_wav_files('/home/bt/dev/voicecurator/ready_queen/wav_original',
-                      '/home/bt/dev/voicecurator/ready_queen/wav',
-                      OUTPUT_RATE)
-elif model == 'mario':
-  downsample_wav_files('/home/bt/dev/voicecurator/ready_mario/wav_original',
-                      '/home/bt/dev/voicecurator/ready_mario/wav',
-                      OUTPUT_RATE)
-elif model == 'billgates':
-  downsample_wav_files('/home/bt/dev/voicecurator/ready_billgates/wav_original',
-                      '/home/bt/dev/voicecurator/ready_billgates/wav',
-                      OUTPUT_RATE)
-elif model == 'zuckerberg':
-  downsample_wav_files('/home/bt/dev/voicecurator/ready_zuckerberg/wav_original',
-                      '/home/bt/dev/voicecurator/ready_zuckerberg/wav',
-                      OUTPUT_RATE)
-elif model == 'bush':
-  downsample_wav_files('/home/bt/dev/voicecurator/ready_bush/wav_original',
-                      '/home/bt/dev/voicecurator/ready_bush/wav',
-                      OUTPUT_RATE)
-elif model == 'danny-devito':
-  downsample_wav_files('/home/bt/dev/voicecurator/ready_danny-devito/wav_original',
-                      '/home/bt/dev/voicecurator/ready_danny-devito/wav',
-                      OUTPUT_RATE)
-elif model == 'christopher-lee':
-  downsample_wav_files('/home/bt/dev/voicecurator/ready_christopher-lee/wav_original',
-                      '/home/bt/dev/voicecurator/ready_christopher-lee/wav',
-                      OUTPUT_RATE)
-elif model == 'barack-obama':
-  downsample_wav_files('/home/bt/dev/voicecurator/ready_barack-obama/wav_original',
-                      '/home/bt/dev/voicecurator/ready_barack-obama/wav',
-                      OUTPUT_RATE)
-elif model == 'betty-white':
-  downsample_wav_files('/home/bt/dev/voicecurator/ready_betty-white/wav_original',
-                      '/home/bt/dev/voicecurator/ready_betty-white/wav',
-                      OUTPUT_RATE)
-elif model == 'dr-phil-mcgraw':
-  downsample_wav_files('/home/bt/dev/voicecurator/ready_dr-phil-mcgraw/wav_original',
-                      '/home/bt/dev/voicecurator/ready_dr-phil-mcgraw/wav',
-                      OUTPUT_RATE)
-elif model == 'fred-rogers':
-  downsample_wav_files('/home/bt/dev/voicecurator/ready_fred-rogers/wav_original',
-                      '/home/bt/dev/voicecurator/ready_fred-rogers/wav',
-                      OUTPUT_RATE)
-elif model == 'bill-clinton':
-  downsample_wav_files('/home/bt/dev/voicecurator/ready_bill-clinton/wav_original',
-                      '/home/bt/dev/voicecurator/ready_bill-clinton/wav',
-                      OUTPUT_RATE)
-elif model == 'gilbert-gottfried':
-  downsample_wav_files('/home/bt/dev/voicecurator/ready_gilbert-gottfried/wav_original',
-                      '/home/bt/dev/voicecurator/ready_gilbert-gottfried/wav',
-                      OUTPUT_RATE)
-else:
-  raise Exception('Wrong model specified: {}.'.format(model))
+downsample_wav_files(args.input_directory, args.output_directory, OUTPUT_RATE)
 
-
-print('Done downsampling for model {}'.format(model))
+print('Done downsampling')
 

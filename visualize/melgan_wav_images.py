@@ -1,16 +1,26 @@
+#!/usr/bin/env python3
+
+import glob
+import os
+import sys
+
+import torch
 from PIL import Image, ImageDraw
 
-def render_histogram(wav, filename='histograms/output.png', row_index=0, col_index=1):
+def render_histogram(wav, output_filename='histograms/output.png', row_index=0, col_index=1):
     dimensions = wav.shape
     print('>>> Image input size: {}'.format(dimensions))
     rows = dimensions[row_index]
     cols = dimensions[col_index]
 
+    width = cols
+    height = rows
+
     # Remove 1-sized dimensions
     wav_signal = wav.squeeze()
 
     print('>>> Generating image (rows: {} cols: {})'.format(rows, cols))
-    image = Image.new('RGB', (rows, cols))
+    image = Image.new('RGB', (width, height))
     pixels = image.load()
 
     minimum = wav_signal[0,0]
@@ -29,15 +39,15 @@ def render_histogram(wav, filename='histograms/output.png', row_index=0, col_ind
     if maximum == minimum:
         maximum = 1 # nb: to prevent division by zero below
 
-    for x in range(0, rows):
-        for y in range(0, cols):
-            v = wav_signal[x,y]
+    for x in range(0, width):
+        for y in range(0, height):
+            v = wav_signal[y,x] # NB: This does a 90 degree flip, but it probably needs a reflection
             scaled = int((v - minimum) / (maximum - minimum) * 255)
             pixels[x, y] = (scaled, scaled, scaled)
 
     # Image Show only works on local X server:
     #image.show()
-    image.save(filename)
+    image.save(output_filename)
 
 def rescale_mel(mel, rescaled_min=-1.0, rescaled_max=1.0):
     # NB: Assumes 3 dimensions
@@ -68,6 +78,27 @@ def rescale_mel(mel, rescaled_min=-1.0, rescaled_max=1.0):
                 d = mel[x,y,z]
                 rescaled = (d - minimum) * rescaled_range / old_range + rescaled_min
                 mel[x,y,z] = rescaled
+
+
+def main(input_directory):
+    for melpath in glob.glob(os.path.join(input_directory, '*.mel')):
+        file_basename = os.path.basename(melpath)
+        print('Handling mel: {}'.format(file_basename))
+
+        mel = torch.load(melpath)
+        rescale_mel(mel)
+
+        output_filename = file_basename + '.png'
+        output_filename = os.path.join ('./output', output_filename)
+
+        render_histogram(mel, output_filename=output_filename, row_index=1, col_index=2)
+
+if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        raise Exception('Need input directory')
+    input_directory = sys.argv[1]
+    print('input_directory', input_directory)
+    main(input_directory)
 
 """
 # The following is taken from SciPy Cookbook

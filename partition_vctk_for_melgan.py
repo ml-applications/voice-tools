@@ -12,6 +12,7 @@ import shutil
 import sys
 
 OUTPUT_DIRECTORY = './output_vctk_melgan'
+PERCENT_VALIDATION = 0.15
 
 def main(vctk_directory, training_directory, validation_directory):
     wav_directory = os.path.join(vctk_directory, 'wav48')
@@ -30,7 +31,7 @@ def main(vctk_directory, training_directory, validation_directory):
         wav_files = get_directory_wav_files(directory)
 
         total_samples = len(wav_files)
-        validation_samples = int(total_samples * 0.15)
+        validation_samples = int(total_samples * PERCENT_VALIDATION)
         training_samples = total_samples - validation_samples
 
         total_training_samples += training_samples

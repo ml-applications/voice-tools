@@ -5,6 +5,7 @@ import librosa
 import numpy as np
 import os
 import scipy
+import scipy.io.wavfile # NB(2020-12-11): New bug; Python 3.8 doesn't pull this in with parent
 import shutil
 import sys
 import time
@@ -91,6 +92,35 @@ def downsample_wav_files(input_dir, output_dir, output_sample_rate):
         print('Processing {}: {}'.format(i, name))
         resample_file(input_filename, output_filename, output_sample_rate)
 
+def downsample_wav_files_recursive(input_dir, output_dir, output_sample_rate):
+    processed_counter = 0
+    for current_directory, current_subdirs, current_files in os.walk(input_dir, topdown=False):
+        wav_files = list(filter(lambda x: x.endswith('.wav'), current_files))
+        if not wav_files:
+            continue
+
+        relative_nested_dir = os.path.relpath(current_directory, input_dir)
+        recursive_src_dir = os.path.join(input_dir, relative_nested_dir)
+        recursive_dst_dir = os.path.join(output_dir, relative_nested_dir)
+
+        os.makedirs(recursive_dst_dir, exist_ok=True)
+
+        print(f'{recursive_src_dir} --> {recursive_dst_dir}')
+
+        for wav_file in wav_files:
+            src_wav_file = os.path.join(recursive_src_dir, wav_file)
+            dst_wav_file = os.path.join(recursive_dst_dir, wav_file)
+
+            if not os.path.isfile(src_wav_file):
+                continue
+
+            if processed_counter % 100 == 0:
+                time.sleep(0.1) # So we can interrupt
+
+            print('Processing {}: {}'.format(processed_counter, src_wav_file))
+            resample_file(src_wav_file, dst_wav_file, output_sample_rate)
+            processed_counter += 1
+
 
 def parse_args():
   parser = argparse.ArgumentParser('Split audio into ingestible chunks')
@@ -103,7 +133,8 @@ args = parse_args()
 print('Input directory: {}'.format(args.input_directory))
 print('Output directory: {}'.format(args.output_directory))
 
-downsample_wav_files(args.input_directory, args.output_directory, OUTPUT_RATE)
+#downsample_wav_files(args.input_directory, args.output_directory, OUTPUT_RATE)
+downsample_wav_files_recursive(args.input_directory, args.output_directory, OUTPUT_RATE)
 
 print('Done downsampling')
 
